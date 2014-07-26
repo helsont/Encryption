@@ -1,4 +1,5 @@
 package encrypter;
+
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 
@@ -42,7 +43,6 @@ import java.awt.Component;
 import javax.swing.UIManager;
 import javax.swing.ListSelectionModel;
 
-
 public class MainFrame extends JFrame implements ActionListener {
 
 	/**
@@ -72,6 +72,8 @@ public class MainFrame extends JFrame implements ActionListener {
 	private JMenu mnNewMenu_2;
 	private JMenuItem mntmPkcspadding;
 	private JMenuItem mntmExit;
+	public boolean processing;
+	int encrypt_count = 0;
 
 	/**
 	 * Launch the application.
@@ -186,47 +188,79 @@ public class MainFrame extends JFrame implements ActionListener {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
+				if (processing)
+					JOptionPane.showMessageDialog(frame,
+							"Please wait, encryption in process.");
+				if (encrypt_count > 0) {
+					int result = JOptionPane
+							.showConfirmDialog(
+									null,
+									"Are you sure you want to encrypt? "
+											+ "Do not reencrypt data. "
+											+ "This will result in permanent data loss.",
+									"Reencrypt Data?",
+									JOptionPane.YES_NO_CANCEL_OPTION);
+					if (result == JOptionPane.CANCEL_OPTION)
+						return;
+					if (result == JOptionPane.NO_OPTION)
+						return;
+				}
 				Encrypter en = new Encrypter();
-				if (_list.size() > 1)
+				en.setLoc();
+				processing = true;
+				
+				if (_list.size() > 0)
 					try {
-						en.encryptFolderNFC(_list);
+						en.encryptFolder(_list);
+						// en.encryptFolderNFC(_list);
 						JOptionPane.showMessageDialog(frame,
 								"Successfully encrypted.");
+						processing = false;
+						encrypt_count++;
 					} catch (FileNotFoundException e) {
 						JOptionPane.showMessageDialog(frame,
 								"Encryption unsuccesful.");
 						e.printStackTrace();
+						processing = false;
 						return;
 					} catch (IllegalBlockSizeException e) {
 						JOptionPane.showMessageDialog(frame,
 								"Encryption unsuccesful.");
 						e.printStackTrace();
+						processing = false;
 						return;
 					} catch (BadPaddingException e) {
 						JOptionPane.showMessageDialog(frame,
 								"Encryption unsuccesful.");
 						e.printStackTrace();
+						processing = false;
 						return;
 					} catch (IOException e) {
 						JOptionPane.showMessageDialog(frame,
 								"Encryption unsuccesful.");
 						e.printStackTrace();
+						processing = false;
 						return;
 					}
 				else
 					try {
+						// en.encryptFolder(_list.get(0));
 						en.encryptOneFileNFC(_list.get(0));
 						JOptionPane.showMessageDialog(frame,
 								"Successfully encrypted.");
+						encrypt_count++;
+						processing = false;
 					} catch (FileNotFoundException e) {
 						JOptionPane.showMessageDialog(frame,
 								"Encryption unsuccesful.");
 						e.printStackTrace();
+						processing = false;
 						return;
 					} catch (IOException e) {
 						JOptionPane.showMessageDialog(frame,
 								"Encryption unsuccesful.");
 						e.printStackTrace();
+						processing = false;
 						return;
 					}
 			}
@@ -241,31 +275,49 @@ public class MainFrame extends JFrame implements ActionListener {
 		splitPane.setRightComponent(btnDecrypt);
 		btnDecrypt.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				if (processing)
+					JOptionPane.showMessageDialog(frame,
+							"Please wait, encryption in process.");
+				encrypt_count = 0;
 				Encrypter de = new Encrypter();
+				de.setLoc();
+				processing = true;
+				
 				for (int i = 0; i < _list.size(); i++) {
 					if (_list.get(i) != null) {
+						if (_list.get(i).isDirectory())
+							decryptDirectory(de, _list.get(i).listFiles());
+
 						try {
 							de.decrypt(_list.get(i));
-							JOptionPane.showMessageDialog(frame, "Successfully decrypted.");
 						} catch (FileNotFoundException e) {
-							JOptionPane.showMessageDialog(frame, "Decryption unuccessful.");
+							JOptionPane.showMessageDialog(frame,
+									"Decryption unuccessful.");
 							e.printStackTrace();
+							processing = false;
 							return;
 						} catch (IllegalBlockSizeException e) {
-							JOptionPane.showMessageDialog(frame, "Decryption unuccessful.");
+							JOptionPane.showMessageDialog(frame,
+									"Decryption unuccessful.");
 							e.printStackTrace();
+							processing = false;
 							return;
 						} catch (BadPaddingException e) {
-							JOptionPane.showMessageDialog(frame, "Decryption unuccessful.");
+							JOptionPane.showMessageDialog(frame,
+									"Decryption unuccessful.");
 							e.printStackTrace();
+							processing = false;
 							return;
 						} catch (IOException e) {
-							JOptionPane.showMessageDialog(frame, "Decryption unuccessful.");
+							JOptionPane.showMessageDialog(frame,
+									"Decryption unuccessful.");
+							processing = false;
 							return;
 						}
 					}
 				}
-				System.out.println("Decrypted!");
+				JOptionPane.showMessageDialog(frame, "Successfully decrypted.");
+				processing = false;
 			}
 		});
 
@@ -285,6 +337,26 @@ public class MainFrame extends JFrame implements ActionListener {
 		gbc_lblPercent.gridx = 1;
 		gbc_lblPercent.gridy = 4;
 		// contentPane.add(lblPercent, gbc_lblPercent);
+	}
+
+	public void decryptDirectory(Encrypter de, File[] files) {
+		for (int a = 0; a < files.length; a++) {
+			if (files[a].isDirectory()) {
+				decryptDirectory(de, files[a].listFiles());
+				continue;
+			}
+			try {
+				de.decrypt(files[a]);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IllegalBlockSizeException e) {
+				e.printStackTrace();
+			} catch (BadPaddingException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	public void actionPerformed(ActionEvent event) {
@@ -321,6 +393,12 @@ public class MainFrame extends JFrame implements ActionListener {
 				System.out.println("No Selection ");
 			}
 		}
+	}
+
+	public void setFileLocation(File file) {
+		Logger.getLogger("Files").log(Level.ALL,
+				"Adding " + file.getAbsolutePath());
+		_list.add(file);
 	}
 
 	public void addFilesFromFolderToArray(File folder) {

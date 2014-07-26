@@ -49,6 +49,9 @@ public class Key implements Serializable {
 		ObjectOutput output;
 		String fullFileName = location + Constants.NAME + ".ser";
 		try {
+			File f = new File(location + Constants.NAME + ".ser");
+			f.createNewFile();
+			
 			file = new FileOutputStream(location + Constants.NAME + ".ser");
 			buffer = new BufferedOutputStream(file);
 			output = new ObjectOutputStream(buffer);
@@ -56,6 +59,7 @@ public class Key implements Serializable {
 			output.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
+		
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -96,9 +100,7 @@ public class Key implements Serializable {
 			int OS = OSValidator.getOS();
 			if (OS == OSValidator.MAC) {
 				File f = new File(loc);
-				System.out.println(f.getAbsolutePath());
 				f.renameTo(new File(location + "." + Constants.NAME + ".ser"));
-				System.out.println(f.getAbsolutePath());
 			} else if (OS == OSValidator.WINDOWS) {
 				Runtime.getRuntime().exec(
 						"attrib +H " + System.getProperty("user.home")
