@@ -17,6 +17,10 @@ public class Leaf extends Node {
 		super(dir);
 	}
 
+	public Leaf(File file) {
+		super(file);
+	}
+
 	public Branch getBranch() {
 		return branch;
 	}

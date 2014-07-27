@@ -2,15 +2,14 @@ package tests;
 
 import java.io.File;
 
-import tree.Branch;
+import main.Constants;
 
-import encrypter.Constants;
-import encrypter.FileUtils;
-import encrypter.IsNotFileException;
+import tree.Branch;
+import utils.FileUtils;
 
 public class Tests {
 
-	public static void main(String[] args) throws IsNotFileException,
+	public static void main(String[] args) throws
 			InterruptedException {
 
 		populateTree();
@@ -25,7 +24,7 @@ public class Tests {
 		FileUtils.createFolder(args);
 	}
 
-	public static void checkHideFile() throws IsNotFileException,
+	public static void checkHideFile() throws 
 			InterruptedException {
 		String location = Constants.loc + File.separator + "Test Folder"
 				+ File.separator;
@@ -35,7 +34,7 @@ public class Tests {
 		System.out.println("Sucess!");
 	}
 
-	public static void checkUnhideFile() throws IsNotFileException {
+	public static void checkUnhideFile() {
 		String location = Constants.loc + File.separator + "Test Folder"
 				+ File.separator;
 		String file_name = ".mbdtf";

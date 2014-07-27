@@ -2,7 +2,8 @@ package tree;
 
 import java.io.File;
 
-import encrypter.FileUtils;
+import utils.FileUtils;
+
 
 public class Node {
 	private String path;
@@ -37,6 +38,10 @@ public class Node {
 
 	public void setParent(Node parent) {
 		this.parent = parent;
+	}
+
+	public File getFile() {
+		return file;
 	}
 
 	public Node getParent() {

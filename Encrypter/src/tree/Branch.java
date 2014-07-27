@@ -53,8 +53,8 @@ public class Branch extends Node {
 		for (int idx = 0; idx < dir.length; idx++) {
 			if (dir[idx].isDirectory()) {
 				leaves[idx] = new Branch(this, dir[idx]);
-			}
-			leaves[idx] = new Leaf(this, dir[idx]);
+			} else
+				leaves[idx] = new Leaf(this, dir[idx]);
 		}
 		return leaves;
 	}

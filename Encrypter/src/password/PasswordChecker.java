@@ -8,9 +8,11 @@ import java.util.Arrays;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 
-import encrypter.Constants;
+import main.Constants;
+
+import utils.FileUtils;
+
 import encrypter.Encrypter;
-import encrypter.FileUtils;
 
 public class PasswordChecker {
 
